@@ -4,7 +4,7 @@ PSQL="psql -X --username=freecodecamp --dbname=number_guess_game --no-align --tu
 # Solicitar al usuario que ingrese un nombre de usuario
 echo "Enter your username:"
 read username
-
+echo "Guess the secret number between 1 and 1000:"
 ADIVINAR_NUMERO(){     
     objetivo=$1
     id_user=$2    
