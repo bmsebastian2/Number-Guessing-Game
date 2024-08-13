@@ -7,12 +7,16 @@ read username
 
 ADIVINAR_NUMERO(){     
     objetivo=$1
-    id_user=$2
-    echo $id_user
+    id_user=$2    
+    echo $objetivo
      # Imprimir el número aleatorio (opcional)
     intentos=0
     while true; do
         read -p "Guess the secret number between 1 and 1000:" numero
+        if ! [[ "$numero" =~ ^-?[0-9]+$ ]]; then
+            echo "That is not an integer, guess again:"
+            continue
+        fi
         intentos=$((intentos + 1))
         if [ "$numero" -eq "$objetivo" ]; then
             echo You guessed it in $intentos tries. The secret number was $1. Nice job!
@@ -39,6 +43,16 @@ CONSULTAR_USER(){
         echo "" 
   fi   
 }
+CONSULTAR_GAMER_USER(){
+     local RESULT=$($PSQL "SELECT COUNT(*) AS cantidad FROM games WHERE id_user=$1")
+     local NAME=$($PSQL "SELECT name_user FROM users WHERE id_user=$1")
+     local BEST_GAME=$($PSQL "SELECT MIN(num_int) AS bestgame FROM games WHERE id_user=$1")
+
+     read GAMES_PLAYED <<< $(echo $RESULT | sed 's/[|]/ /g')
+     read NAME_PLAYED <<< $(echo $NAME | sed 's/[|]/ /g')
+     read BEST <<< $(echo $BEST_GAME | sed 's/[|]/ /g')
+     echo "Welcome back, $NAME_PLAYED! You have played $GAMES_PLAYED games, and your best game took $BEST_GAME guesses., with $NAME_PLAYED"
+}
 ADD_USE(){
    local add_user=$($PSQL "INSERT INTO users(name_user) VALUES('$1')")   
    echo Welcome, $1! It looks like this is your first time here.  
@@ -53,7 +67,8 @@ if [ ${#username} -le 22 ]; then
     if [ -z "$resultado" ]; then
       ADD_USE $username
       ADIVINAR_NUMERO  $(( (RANDOM % 1000) + 1)) $(CONSULTAR_USER $username)  
-    else     
+    else
+      CONSULTAR_GAMER_USER $resultado
       ADIVINAR_NUMERO  $(( (RANDOM % 1000) + 1)) $(CONSULTAR_USER $username)  
     fi
       
