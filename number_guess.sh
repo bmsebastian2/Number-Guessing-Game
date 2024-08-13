@@ -39,7 +39,7 @@ CONSULTAR_USER(){
        read ID_USER NAME_USER <<< $(echo $RESULT | sed 's/[|]/ /g')
         echo $ID_USER
     else
-      # else notify the absence of the symbol       
+           
         echo "" 
   fi   
 }
